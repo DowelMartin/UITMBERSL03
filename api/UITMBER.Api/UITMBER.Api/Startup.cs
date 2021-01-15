@@ -12,6 +12,7 @@ using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
 using Swashbuckle.AspNetCore.SwaggerUI;
 using UITMBER.Api.Data;
+using UITMBER.Api.Repositories.Cars;
 
 namespace UITMBER.Api
 {
@@ -33,6 +34,9 @@ namespace UITMBER.Api
             services.AddDbContext<UDbContext>(opt => opt.UseSqlServer(Configuration.GetConnectionString("Default")));
 
             services.AddSwaggerGen();
+
+
+            services.AddTransient<ICarRepository, CarRepository>();
 
         }
 
