@@ -1,7 +1,9 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Text;
 using System.Threading.Tasks;
+using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Mvc;
@@ -10,7 +12,9 @@ using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
+using Microsoft.IdentityModel.Tokens;
 using Swashbuckle.AspNetCore.SwaggerUI;
+using UITMBER.Api.Configuration;
 using UITMBER.Api.Data;
 using UITMBER.Api.Repositories.Cars;
 
@@ -30,6 +34,8 @@ namespace UITMBER.Api
         public void ConfigureServices(IServiceCollection services)
         {
             services.AddControllers();
+
+            ConfigureAuthentication(ref services);
 
             services.AddDbContext<UDbContext>(opt => opt.UseSqlServer(Configuration.GetConnectionString("Default")));
 
@@ -62,6 +68,9 @@ namespace UITMBER.Api
 
             app.UseSwagger();
 
+
+
+
             app.UseSwaggerUI(c =>
             {
                 c.SwaggerEndpoint("/swagger/v1/swagger.json", "My API V1");
@@ -75,5 +84,38 @@ namespace UITMBER.Api
                 endpoints.MapControllers();
             });
         }
+
+        private void ConfigureAuthentication(ref IServiceCollection services)
+        {
+
+            var appSettingsSection = Configuration.GetSection("AppSettings");
+            services.Configure<AppSettings>(appSettingsSection);
+
+
+            var appSettings = appSettingsSection.Get<AppSettings>();
+
+            var key = Encoding.ASCII.GetBytes(appSettings.JWTSecurityKey);
+            services.AddAuthentication(x =>
+            {
+                x.DefaultAuthenticateScheme = JwtBearerDefaults.AuthenticationScheme;
+                x.DefaultChallengeScheme = JwtBearerDefaults.AuthenticationScheme;
+            })
+            .AddJwtBearer(x =>
+            {
+                x.RequireHttpsMetadata = false;
+                x.SaveToken = true;
+                x.TokenValidationParameters = new TokenValidationParameters
+                {
+                    ValidateIssuerSigningKey = true,
+                    IssuerSigningKey = new SymmetricSecurityKey(key),
+                    ValidateIssuer = true,
+                    ValidIssuer = appSettings.JWTIssuer,
+                    ValidateAudience = true,
+                    ValidAudience = appSettings.JWTAudience,
+                    RequireExpirationTime = true
+                };
+            });
+        }
     }
 }
+
