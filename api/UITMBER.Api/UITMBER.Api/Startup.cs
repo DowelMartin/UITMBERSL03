@@ -37,6 +37,8 @@ namespace UITMBER.Api
         {
             services.AddControllers();
 
+            services.AddAuthorization();
+
             ConfigureAuthentication(ref services);
 
             services.AddDbContext<UDbContext>(opt => opt.UseSqlServer(Configuration.GetConnectionString("Default")));
