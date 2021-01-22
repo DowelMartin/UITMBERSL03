@@ -25,6 +25,7 @@ namespace UITMBER.Api.Controllers
             _appSettings = appSettings;
         }
 
+        //Rejestracja
         [HttpPost]
         public async Task<IActionResult> Register([FromBody] RegisterModel input)
         {
@@ -59,6 +60,7 @@ namespace UITMBER.Api.Controllers
 
 
         //Logowanie
+        [HttpPost]
         public async Task<IActionResult> Authenticate([FromBody] AuthenticationnModel input)
         {
             try

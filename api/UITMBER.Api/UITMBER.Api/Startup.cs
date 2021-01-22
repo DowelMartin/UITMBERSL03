@@ -16,6 +16,7 @@ using Microsoft.IdentityModel.Tokens;
 using Swashbuckle.AspNetCore.SwaggerUI;
 using UITMBER.Api.Configuration;
 using UITMBER.Api.Data;
+using UITMBER.Api.Repositories.Auth;
 using UITMBER.Api.Repositories.Cars;
 
 namespace UITMBER.Api
@@ -44,9 +45,9 @@ namespace UITMBER.Api
 
             services.AddSwaggerGen();
 
-
+            services.AddTransient<IAuthenticationRepository, AuthenticationRepository>();
             services.AddTransient<ICarRepository, CarRepository>();
-
+            
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
@@ -89,10 +90,13 @@ namespace UITMBER.Api
         {
 
             var appSettingsSection = Configuration.GetSection("AppSettings");
-            services.Configure<AppSettings>(appSettingsSection);
+          //  services.Configure<AppSettings>(appSettingsSection);
 
 
             var appSettings = appSettingsSection.Get<AppSettings>();
+
+            services.AddSingleton<AppSettings>(appSettings);
+
 
             var key = Encoding.ASCII.GetBytes(appSettings.JWTSecurityKey);
             services.AddAuthentication(x =>
