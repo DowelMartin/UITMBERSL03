@@ -11,7 +11,7 @@ namespace UITMBER.Api.Controllers
 {
     [ApiController]
     [Route("[controller]/[action]")]
-   // [Authorize]
+    [Authorize(AuthenticationSchemes = "Bearer")]
     public class CarController : ControllerBase
     {
         private readonly ICarRepository _carRepository;
@@ -22,6 +22,7 @@ namespace UITMBER.Api.Controllers
         }
 
         [HttpGet]
+        [Authorize(Roles = "Driver")]
         public Task<List<CarDto>> GetMyCars()
         {
             //Pobieranie id usera z tokenu
