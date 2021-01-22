@@ -13,6 +13,7 @@ using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
 using Microsoft.IdentityModel.Tokens;
+using Microsoft.OpenApi.Models;
 using Swashbuckle.AspNetCore.SwaggerUI;
 using UITMBER.Api.Configuration;
 using UITMBER.Api.Data;
@@ -43,7 +44,36 @@ namespace UITMBER.Api
 
             services.AddHttpContextAccessor();
 
-            services.AddSwaggerGen();
+            services.AddSwaggerGen(s=> {
+
+
+                s.AddSecurityDefinition("Bearer", new OpenApiSecurityScheme
+                {
+                    Description = "JWT Authorization header using the Bearer scheme (Example: 'Bearer 12345abcdef')",
+                    Name = "Authorization",
+                    In = ParameterLocation.Header,
+                    Type = SecuritySchemeType.ApiKey,
+                    Scheme = "Bearer"
+                });
+
+                s.AddSecurityRequirement(new OpenApiSecurityRequirement
+            {
+                {
+                    new OpenApiSecurityScheme
+                    {
+                        Reference = new OpenApiReference
+                        {
+                            Type = ReferenceType.SecurityScheme,
+                            Id = "Bearer"
+                        }
+                    },
+                    Array.Empty<string>()
+                }
+            });
+            }
+            
+            
+            );
 
             services.AddTransient<IAuthenticationRepository, AuthenticationRepository>();
             services.AddTransient<ICarRepository, CarRepository>();
@@ -67,10 +97,12 @@ namespace UITMBER.Api
 
             app.UseAuthorization();
 
+            app.UseAuthentication();
+
             app.UseSwagger();
 
 
-
+            
 
             app.UseSwaggerUI(c =>
             {
