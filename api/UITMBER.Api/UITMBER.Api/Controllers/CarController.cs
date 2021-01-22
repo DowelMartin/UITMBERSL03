@@ -20,8 +20,11 @@ namespace UITMBER.Api.Controllers
         }
 
         [HttpGet]
-        public Task<List<CarDto>> GetMyCars(long userId = 1)
+        public Task<List<CarDto>> GetMyCars(int userId = 1)
         {
+            //Pobieranie id usera z tokenu
+            //var userId = Convert.ToInt32(User.FindFirst("UserId")?.Value);
+
             return _carRepository.GetMyCars(userId);
         }
     }
