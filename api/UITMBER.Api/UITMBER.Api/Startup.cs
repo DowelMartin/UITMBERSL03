@@ -33,6 +33,9 @@ namespace UITMBER.Api
 
             services.AddDbContext<UDbContext>(opt => opt.UseSqlServer(Configuration.GetConnectionString("Default")));
 
+
+            services.AddHttpContextAccessor();
+
             services.AddSwaggerGen();
 
 
@@ -47,6 +50,11 @@ namespace UITMBER.Api
             {
                 app.UseDeveloperExceptionPage();
             }
+
+            app.UseCors(x => x
+       .AllowAnyOrigin()
+       .AllowAnyMethod()
+       .AllowAnyHeader());
 
             app.UseRouting();
 
