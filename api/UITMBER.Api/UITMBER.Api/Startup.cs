@@ -13,6 +13,7 @@ using Microsoft.Extensions.Logging;
 using Swashbuckle.AspNetCore.SwaggerUI;
 using UITMBER.Api.Data;
 using UITMBER.Api.Repositories.Cars;
+using UITMBER.Api.Repositories.Drivers;
 
 namespace UITMBER.Api
 {
@@ -37,6 +38,7 @@ namespace UITMBER.Api
 
 
             services.AddTransient<ICarRepository, CarRepository>();
+            services.AddTransient<IDriverRepository, DriverRepository>();
 
         }
 
