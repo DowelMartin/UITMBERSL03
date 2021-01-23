@@ -24,14 +24,10 @@ namespace UITMBER.Api.Controllers
         }
 
         [HttpGet]
-        public async Task<IEnumerable<DriverDto>> GetNerbyDriveresAsync(double latitude, double longitude, double maxDistance=1) {
+        public async Task<IEnumerable<DriverDto>> GetNerbyDriveresAsync(double latitude, double longitude) {
 
             List<DriverDto> drivers = await _driverRepository.GetDrivers();
-            return drivers.Where(driver => CalculateDistance(latitude, longitude, driver.Lat, driver.Long) <= maxDistance);
-        }
-        private double CalculateDistance(double x1, double y1, double x2, double y2)
-        {
-            return Math.Sqrt(Math.Pow(x1 - x2, 2) + Math.Pow(y1 - y2, 2));
+            return drivers.Where(driver => Double.Equals(driver.Lat,latitude) && Double.Equals(driver.Long,longitude));
         }
 
         [HttpGet]
