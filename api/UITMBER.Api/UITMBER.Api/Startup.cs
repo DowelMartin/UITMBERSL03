@@ -19,7 +19,11 @@ using UITMBER.Api.Configuration;
 using UITMBER.Api.Data;
 using UITMBER.Api.Repositories.Auth;
 using UITMBER.Api.Repositories.Cars;
+
 using UITMBER.Api.Repositories.Drivers;
+
+using UITMBER.Api.Repositories.Locations;
+
 
 namespace UITMBER.Api
 {
@@ -79,8 +83,11 @@ namespace UITMBER.Api
           
             services.AddTransient<IAuthenticationRepository, AuthenticationRepository>();
             services.AddTransient<ICarRepository, CarRepository>();
+
             services.AddTransient<IDriverRepository, DriverRepository>();
-            
+
+            services.AddTransient<ILocationRepository, LocationRepository>();
+
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
