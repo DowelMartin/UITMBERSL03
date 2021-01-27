@@ -21,6 +21,15 @@ using UITMBER.Api.Repositories.Auth;
 using UITMBER.Api.Repositories.Cars;
 using UTIMBER.Api.Repositories.Applications;
 
+using UITMBER.Api.Repositories.Orders;
+
+
+
+using UITMBER.Api.Repositories.Drivers;
+
+using UITMBER.Api.Repositories.Locations;
+
+
 namespace UITMBER.Api
 {
     public class Startup
@@ -46,7 +55,6 @@ namespace UITMBER.Api
 
 
             services.AddHttpContextAccessor();
-
             services.AddSwaggerGen(s=> {
 
 
@@ -77,11 +85,22 @@ namespace UITMBER.Api
             
             
             );
-
+          
             services.AddTransient<IAuthenticationRepository, AuthenticationRepository>();
             services.AddTransient<ICarRepository, CarRepository>();
+
 	    services.AddTransient<IUserAplicationRepository, UserAplicationRepository>();
+
+
+            services.AddTransient<IOrderRepository, OrderRepository>();
+
             
+
+
+            services.AddTransient<IDriverRepository, DriverRepository>();
+
+            services.AddTransient<ILocationRepository, LocationRepository>();
+
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
