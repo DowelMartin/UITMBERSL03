@@ -1,7 +1,9 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Text;
 using System.Threading.Tasks;
+using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Mvc;
@@ -10,10 +12,26 @@ using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
+using Microsoft.IdentityModel.Tokens;
+using Microsoft.OpenApi.Models;
 using Swashbuckle.AspNetCore.SwaggerUI;
+using UITMBER.Api.Configuration;
 using UITMBER.Api.Data;
+using UITMBER.Api.Repositories.Auth;
 using UITMBER.Api.Repositories.Cars;
+
+
+using UTIMBER.Api.Repositories.Applications;
+
 using UITMBER.Api.Repositories.Orders;
+
+
+
+using UITMBER.Api.Repositories.Drivers;
+
+using UITMBER.Api.Repositories.Locations;
+
+
 
 namespace UITMBER.Api
 {
@@ -32,13 +50,60 @@ namespace UITMBER.Api
         {
             services.AddControllers();
 
+            services.AddAuthorization();
+
+            ConfigureAuthentication(ref services);
+
             services.AddDbContext<UDbContext>(opt => opt.UseSqlServer(Configuration.GetConnectionString("Default")));
 
-            services.AddSwaggerGen();
+
+            services.AddHttpContextAccessor();
+            services.AddSwaggerGen(s=> {
 
 
+                s.AddSecurityDefinition("Bearer", new OpenApiSecurityScheme
+                {
+                    Description = "JWT Authorization header using the Bearer scheme (Example: 'Bearer 12345abcdef')",
+                    Name = "Authorization",
+                    In = ParameterLocation.Header,
+                    Type = SecuritySchemeType.ApiKey,
+                    Scheme = "Bearer"
+                });
+
+                s.AddSecurityRequirement(new OpenApiSecurityRequirement
+            {
+                {
+                    new OpenApiSecurityScheme
+                    {
+                        Reference = new OpenApiReference
+                        {
+                            Type = ReferenceType.SecurityScheme,
+                            Id = "Bearer"
+                        }
+                    },
+                    Array.Empty<string>()
+                }
+            });
+            }
+            
+            
+            );
+          
+            services.AddTransient<IAuthenticationRepository, AuthenticationRepository>();
             services.AddTransient<ICarRepository, CarRepository>();
             services.AddTransient<IOrderRepository, OrderRepository>();
+
+	    services.AddTransient<IUserAplicationRepository, UserAplicationRepository>();
+
+
+            services.AddTransient<IOrderRepository, OrderRepository>();
+
+            
+
+
+            services.AddTransient<IDriverRepository, DriverRepository>();
+
+            services.AddTransient<ILocationRepository, LocationRepository>();
 
         }
 
@@ -50,11 +115,21 @@ namespace UITMBER.Api
                 app.UseDeveloperExceptionPage();
             }
 
+            app.UseCors(x => x
+       .AllowAnyOrigin()
+       .AllowAnyMethod()
+       .AllowAnyHeader());
+
             app.UseRouting();
 
             app.UseAuthorization();
 
+            app.UseAuthentication();
+
             app.UseSwagger();
+
+
+            
 
             app.UseSwaggerUI(c =>
             {
@@ -69,5 +144,41 @@ namespace UITMBER.Api
                 endpoints.MapControllers();
             });
         }
+
+        private void ConfigureAuthentication(ref IServiceCollection services)
+        {
+
+            var appSettingsSection = Configuration.GetSection("AppSettings");
+          //  services.Configure<AppSettings>(appSettingsSection);
+
+
+            var appSettings = appSettingsSection.Get<AppSettings>();
+
+            services.AddSingleton<AppSettings>(appSettings);
+
+
+            var key = Encoding.ASCII.GetBytes(appSettings.JWTSecurityKey);
+            services.AddAuthentication(x =>
+            {
+                x.DefaultAuthenticateScheme = JwtBearerDefaults.AuthenticationScheme;
+                x.DefaultChallengeScheme = JwtBearerDefaults.AuthenticationScheme;
+            })
+            .AddJwtBearer(x =>
+            {
+                x.RequireHttpsMetadata = false;
+                x.SaveToken = true;
+                x.TokenValidationParameters = new TokenValidationParameters
+                {
+                    ValidateIssuerSigningKey = true,
+                    IssuerSigningKey = new SymmetricSecurityKey(key),
+                    ValidateIssuer = true,
+                    ValidIssuer = appSettings.JWTIssuer,
+                    ValidateAudience = true,
+                    ValidAudience = appSettings.JWTAudience,
+                    RequireExpirationTime = true
+                };
+            });
+        }
     }
 }
+
