@@ -18,9 +18,9 @@ namespace UTIMBER.Api.Repositories.Applications
             _dbContext = dbContext;
         }
 
-        public async Task<List<UserApplicationDto>> GetMyApplications()
+        public async Task<List<UserApplicationDto>> GetMyApplications(long userId)
         {
-            return await _dbContext.UserApplications
+            return await _dbContext.UserApplications.Where(x => x.UserId == userId)
                 .Select(x => new UserApplicationDto()
                 {
                     Id = x.Id,
@@ -36,7 +36,7 @@ namespace UTIMBER.Api.Repositories.Applications
             UserApplication objToAdd = new UserApplication();
             objToAdd.UserId = obj.UserId;
             objToAdd.Date = obj.Date;
-            objToAdd.Accepted = obj.Accepted;
+            objToAdd.Accepted = false;
             objToAdd.CarId = obj.CarId;
 
             _dbContext.UserApplications.Add(objToAdd);

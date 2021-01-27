@@ -9,8 +9,7 @@ namespace UTIMBER.Api.Repositories.Applications
 {
     public interface IUserAplicationRepository
     {
-        Task<List<UserApplicationDto>> GetMyApplications();
-        //IEnumerable<UserApplication> GetMyApplications();
+        Task<List<UserApplicationDto>> GetMyApplications(long userId);
         void SendApplication(UserApplicationDto obj);
     }
 }

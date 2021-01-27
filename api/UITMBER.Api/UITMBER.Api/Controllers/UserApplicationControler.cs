@@ -1,4 +1,5 @@
-﻿using Microsoft.AspNetCore.Mvc;
+﻿using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Mvc;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -9,10 +10,9 @@ using UTIMBER.Api.Repositories.Applications.Dto;
 
 namespace UTIMBER.Api.Controllers
 {
-
-    [Route("[controller]")]
     [ApiController]
-    public class UserApplicationControler
+    [Route("[controller]")]
+    public class UserApplicationControler : ControllerBase
     {
         private readonly IUserAplicationRepository _userAplicationRepository;
 
@@ -22,9 +22,11 @@ namespace UTIMBER.Api.Controllers
         }
 
         [HttpGet]
-        public Task<List<UserApplicationDto>> GetAll()
+        public Task<List<UserApplicationDto>> GetMyAplication()
         {
-            return _userAplicationRepository.GetMyApplications();
+            var userId = Convert.ToInt32(User.FindFirst("UserId")?.Value);
+
+            return _userAplicationRepository.GetMyApplications(userId);
 
         }
 
