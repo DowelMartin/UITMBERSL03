@@ -19,6 +19,7 @@ using UITMBER.Api.Configuration;
 using UITMBER.Api.Data;
 using UITMBER.Api.Repositories.Auth;
 using UITMBER.Api.Repositories.Cars;
+using UTIMBER.Api.Repositories.Applications;
 
 using UITMBER.Api.Repositories.Orders;
 
@@ -88,7 +89,11 @@ namespace UITMBER.Api
             services.AddTransient<IAuthenticationRepository, AuthenticationRepository>();
             services.AddTransient<ICarRepository, CarRepository>();
 
+	    services.AddTransient<IUserAplicationRepository, UserAplicationRepository>();
+
+
             services.AddTransient<IOrderRepository, OrderRepository>();
+
             
 
 
